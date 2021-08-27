@@ -1,0 +1,17 @@
+[
+    {
+        "timestamp": "2021-08-18T08:24:25.337Z",
+        "type": "Gateway",
+        "mac": "AC233FC09A3F",
+        "gatewayFree": 93,
+        "gatewayLoad": 1.4
+    },
+    {
+        "timestamp": "2021-08-18T08:24:29.516Z",
+        "type": "Unknown",
+        "mac": "FEFDD727C6F5",
+        "bleName": "",
+        "rssi": -29,
+        "rawData": ""
+    }
+]

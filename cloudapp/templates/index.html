@@ -1,0 +1,91 @@
+{% load read_cloudmqtt %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <title>Real-Time Cloud MQTT Data</title>
+</head>
+<body>
+
+    <div class="container">
+        <div class="">
+            <div class="col-12 mx-auto">
+                <h1 id="app">{{ text }}</h1>
+
+                <table class="table table-striped table-hover" id="device-table">
+                    <thead>
+                        <tr>
+                            <th>Timestamp</th>
+                            <th>Type</th>
+                            <th>Device Mac</th>
+                            <th>bleName</th>
+                            <th>rssi</th>
+                            <th>rawData</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody">
+                        {% with mqtt_data2 as mqtt_data %}
+                            {% for row in mqtt_data %}
+                                <tr>
+                                    <td>{{ row.Timestamp }}</td>
+                                    <td>{{ row.Type }}</td>
+                                    <td>{{ row.Mac }}</td>
+                                    <td>{{ row.bleName }}</td>
+                                    <td>{{ row.Rssi }}</td>
+                                    <td>{{ row.rawData }}</td>
+                                </tr>
+                            {% endfor %}
+                        {% endwith %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <script>
+        function runSocket() {
+            var socket = new WebSocket('ws://localhost:8000/ws/some_url/');
+            let tbody = document.querySelector('#tbody');
+
+            socket.onmessage = function(event) {
+                var eventData = JSON.parse(event.data);
+                let data = eventData.data;
+                let mqtt_data = JSON.parse(data);
+                if (mqtt_data.length !== 0) {
+                    mqtt_data = JSON.parse(data)[0];
+                    let Timestamp = mqtt_data.Timestamp;
+                    let Type = mqtt_data.Type;
+                    let Mac = mqtt_data.Mac;
+                    let bleName = mqtt_data.BleName;
+                    let rssi = mqtt_data.Rssi;
+                    let rawData = mqtt_data.RawData;
+                    console.log(JSON.stringify({
+                        'Timestamp': Timestamp,
+                        'Type': Type,
+                        'Mac': Mac,
+                        'bleName': bleName,
+                        'rssi': rssi,
+                        'rawData': rawData
+                    }, undefined, 4));
+
+                    let tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${ Timestamp }</td>
+                        <td>${ Type }</td>
+                        <td>${ Mac }</td>
+                        <td>${ bleName }</td>
+                        <td>${ rssi }</td>
+                        <td>${ rawData }</td>
+                    `;
+                    tbody.appendChild(tr);
+                }
+            }
+        }
+        let setInterval1 = setInterval(runSocket, 1000);
+        runSocket();
+    </script>
+</body>
+</html>
